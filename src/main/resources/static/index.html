@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyntaxLoops | Cloud ERP Interface</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Quicksand', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    colors: { syntaxCyan: '#14b8a6', syntaxDark: '#030712', syntaxCard: '#0f172a' }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #030712; color: #f8fafc; overflow: hidden; font-family: 'Quicksand', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #14b8a6; }
+
+        .grid-bg {
+            background-size: 40px 40px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            position: fixed; inset: 0; z-index: -2;
+        }
+
+        .glow-orb {
+            position: fixed; border-radius: 50%; filter: blur(140px); opacity: 0.35; z-index: -1;
+            animation: float 15s infinite ease-in-out alternate;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, -80px) scale(1.15); }
+        }
+
+        .bento-card {
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.5) 0%, rgba(3, 7, 18, 0.8) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(20, 184, 166, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="antialiased selection:bg-syntaxCyan selection:text-black flex h-screen w-screen relative">
+
+<div class="grid-bg"></div>
+<div class="glow-orb bg-syntaxCyan w-[600px] h-[600px] top-[-150px] left-[-150px]"></div>
+<div class="glow-orb bg-blue-900 w-[500px] h-[500px] bottom-[-100px] right-[-100px]" style="animation-delay: -5s;"></div>
+
+<div id="system-alert-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[#030712]/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300">
+    <div id="system-alert-box" class="bento-card p-8 rounded-[2rem] max-w-sm w-full mx-4 transform scale-95 transition-transform duration-300 shadow-[0_0_50px_rgba(20,184,166,0.2)] text-center relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-syntaxCyan to-transparent" id="system-alert-accent"></div>
+        <div id="system-alert-icon" class="w-16 h-16 rounded-2xl bg-syntaxCyan/10 border border-syntaxCyan/30 flex items-center justify-center mx-auto mb-5 shadow-[0_0_20px_rgba(20,184,166,0.2)]">
+            <i class="fa-solid fa-circle-info text-2xl text-syntaxCyan" id="system-alert-icon-svg"></i>
+        </div>
+        <h3 id="system-alert-title" class="text-xl font-black text-white mb-2 tracking-tight"></h3>
+        <p id="system-alert-message" class="text-sm text-slate-400 mb-8 leading-relaxed font-medium"></p>
+    </div>
+</div>
+
+<div id="login-gate" class="fixed inset-0 z-50 flex items-center justify-center bg-[#030712]/95 backdrop-blur-2xl transition-opacity duration-700">
+    <div class="bento-card p-10 rounded-[2.5rem] w-full max-w-md relative overflow-hidden shadow-[0_0_80px_rgba(20,184,166,0.15)]">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-syntaxCyan to-transparent"></div>
+        <div class="text-center mb-10">
+            <div class="w-16 h-16 rounded-2xl bg-syntaxCyan/10 border border-syntaxCyan/30 flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(20,184,166,0.2)]">
+                <i class="fa-solid fa-bolt text-2xl text-syntaxCyan"></i>
+            </div>
+            <h2 class="text-3xl font-black text-white tracking-tight mb-2">Syntax<span class="text-syntaxCyan">Loops</span></h2>
+            <p class="text-slate-400 font-mono text-xs uppercase tracking-widest">Enterprise Authentication</p>
+        </div>
+        <form id="form-login" class="space-y-6">
+            <div>
+                <label class="block text-[10px] font-mono text-slate-500 uppercase tracking-widest font-bold mb-2">Corporate Email</label>
+                <input type="email" id="auth-email" required class="w-full bg-black/50 border border-slate-700/60 focus:border-syntaxCyan rounded-xl px-5 py-4 text-white font-mono text-sm outline-none transition-all placeholder:text-slate-700" placeholder="ceo@company.com">
+            </div>
+            <div>
+                <label class="block text-[10px] font-mono text-slate-500 uppercase tracking-widest font-bold mb-2">Secure Key</label>
+                <input type="password" id="auth-key" required class="w-full bg-black/50 border border-slate-700/60 focus:border-syntaxCyan rounded-xl px-5 py-4 text-white font-mono text-sm outline-none transition-all placeholder:text-slate-700" placeholder="••••••••••••">
+            </div>
+            <button type="submit" id="btn-login" class="w-full bg-syntaxCyan text-black font-black text-sm uppercase tracking-wider py-4 rounded-xl hover:bg-white transition-all shadow-[0_0_20px_rgba(20,184,166,0.3)] mt-4">
+                Initialize Session
+            </button>
+        </form>
+    </div>
+</div>
+
+<aside class="w-72 h-full bento-card border-y-0 border-l-0 rounded-none flex flex-col z-20 shrink-0 relative overflow-hidden">
+    <div class="p-8 flex items-center gap-4 border-b border-white/5 relative z-10">
+        <div class="w-10 h-10 rounded-xl bg-syntaxCyan/10 border border-syntaxCyan/40 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-layer-group text-syntaxCyan text-lg"></i>
+        </div>
+        <div>
+            <span class="font-black text-2xl tracking-tight text-white block leading-none">Syntax<span class="text-syntaxCyan">Loops</span></span>
+            <span id="sidebar-edition" class="text-[9px] font-mono text-slate-500 uppercase tracking-widest mt-1 block">ERP Edition</span>
+        </div>
+    </div>
+
+    <nav class="flex-1 p-5 space-y-1.5 overflow-y-auto relative z-10" id="sidebar-nav">
+        <p class="px-4 text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest mb-3 mt-4">Workspace</p>
+        <a href="#dashboard" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-chart-pie w-5 text-center"></i><span class="text-left">Command Center</span>
+        </a>
+        <a href="#orders" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-boxes-packing w-5 text-center"></i><span class="text-left">Omnichannel Pipeline</span>
+        </a>
+        <a href="#manual-order" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-cart-plus w-5 text-center"></i><span class="text-left">Manual Order Entry</span>
+        </a>
+
+        <p class="px-4 text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest mb-3 mt-8">Core Accounting</p>
+        <a href="#auto-entry" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-bolt w-5 text-center"></i><span class="text-left">Auto Entry (Simple)</span>
+        </a>
+        <a href="#banking" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-money-check-dollar w-5 text-center"></i><span class="text-left">Bank Management</span>
+        </a>
+        <a href="#assets" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-building-columns w-5 text-center"></i><span class="text-left">Asset Management</span>
+        </a>
+        <a href="#expense-heads" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-tags w-5 text-center"></i><span class="text-left">Expense Categories</span>
+        </a>
+        <a href="#depreciation" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-arrow-trend-down w-5 text-center"></i><span class="text-left">Depreciation Studio</span>
+        </a>
+        <a href="#journal" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-book-journal-whills w-5 text-center"></i><span class="text-left">Journal Studio</span>
+        </a>
+        <a href="#voucher-ledger" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-receipt w-5 text-center"></i><span class="text-left">Voucher Ledger</span>
+        </a>
+        <a href="#account-statement" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-file-lines w-5 text-center"></i><span class="text-left">Account Statements</span>
+        </a>
+
+        <p class="px-4 text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest mb-3 mt-8">Financial Audits</p>
+        <a href="#income-statement" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i><span class="text-left">Income Statement</span>
+        </a>
+        <a href="#balance-sheet" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-scale-balanced w-5 text-center"></i><span class="text-left">Balance Sheet</span>
+        </a>
+        <a href="#trial-balance" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-scale-unbalanced w-5 text-center"></i><span class="text-left">Trial Balance</span>
+        </a>
+
+        <p class="px-4 text-[10px] font-mono font-bold text-slate-600 uppercase tracking-widest mb-3 mt-8">Administration</p>
+        <a href="#team" class="nav-btn w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/50 font-semibold text-sm transition-all">
+            <i class="fa-solid fa-users-gear w-5 text-center"></i><span class="text-left">Team Access</span>
+        </a>
+    </nav>
+</aside>
+
+<main class="flex-1 h-full flex flex-col z-10 relative overflow-hidden">
+
+    <header class="h-24 flex items-center justify-between px-10 shrink-0 border-b border-white/[0.02] bg-black/20 backdrop-blur-sm z-20">
+        <h1 id="header-title" class="text-3xl font-black text-white tracking-tight">Loading Workspace...</h1>
+        <div class="flex items-center gap-6">
+            <div class="text-right mr-2 hidden sm:block">
+                <div id="topbar-name" class="text-sm font-bold text-white leading-none">...</div>
+                <div id="topbar-id" class="text-[10px] font-mono text-slate-500 mt-1">...</div>
+            </div>
+
+            <a href="#settings" class="w-12 h-12 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center hover:border-syntaxCyan transition-colors group shadow-lg">
+                <i class="fa-solid fa-gear text-slate-400 group-hover:text-syntaxCyan transition-colors"></i>
+            </a>
+            <button id="btn-logout" class="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center hover:bg-red-500 transition-colors group shadow-lg">
+                <i class="fa-solid fa-power-off text-red-500 group-hover:text-white transition-colors"></i>
+            </button>
+        </div>
+    </header>
+
+    <div id="app-root" class="flex-1 overflow-y-auto p-10 relative">
+    </div>
+
+</main>
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
