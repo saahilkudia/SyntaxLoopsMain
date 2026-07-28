@@ -19,22 +19,21 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        // Directs root requests on app.syntaxloops.com to load index.html
+    public void addViewController(ViewControllerRegistry registry) {
         registry.addViewController("/").setViewName("forward:/index.html");
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Allows cross-subdomain communication between app UI and api backend
         registry.addMapping("/**")
-                .allowedOrigins(
-                        "https://www.syntaxloops.com",
-                        "https://app.syntaxloops.com",
-                        "http://localhost:8080"
+                .allowedOriginPatterns(
+                        "https://*.syntaxloops.com",
+                        "https://syntaxloops.com",
+                        "http://localhost:*"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
+                .exposedHeaders("Authorization", "X-Tenant-ID")
                 .allowCredentials(true)
                 .maxAge(3600);
     }
