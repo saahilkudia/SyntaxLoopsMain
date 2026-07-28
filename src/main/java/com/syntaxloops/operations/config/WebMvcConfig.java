@@ -28,7 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOriginPatterns(
                         "https://*.syntaxloops.com",
-                        "https://app.syntaxloops.com",
+                        "https://syntaxloops.com",
                         "http://localhost:*"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")

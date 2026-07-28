@@ -10,6 +10,11 @@ public class DomainRoutingInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // ALWAYS let CORS preflight (OPTIONS) requests pass through
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
+
         String host = request.getHeader("Host");
         String uri = request.getRequestURI();
 
@@ -23,6 +28,7 @@ public class DomainRoutingInterceptor implements HandlerInterceptor {
                 return false;
             }
         }
+
         return true;
     }
 }
