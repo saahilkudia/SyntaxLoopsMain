@@ -15,11 +15,12 @@ public class DomainRoutingInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String host = request.getHeader("Host");
+        // USE getServerName() TO PREVENT AZURE PROXY BUGS
+        String serverName = request.getServerName();
         String uri = request.getRequestURI();
 
         // Enforce strict separation when requests hit api.syntaxloops.com
-        if (host != null && host.contains("api.syntaxloops.com")) {
+        if (serverName != null && serverName.equalsIgnoreCase("api.syntaxloops.com")) {
             // Block UI root requests, html views, and static assets
             if (uri.equals("/") || uri.endsWith(".html") || uri.startsWith("/js/") || uri.startsWith("/css/")) {
                 response.setContentType("application/json");
