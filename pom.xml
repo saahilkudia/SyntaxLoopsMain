@@ -70,6 +70,17 @@
 
 	<build>
 		<plugins>
+			<!-- 1. SKIP SUREFIRE TESTS ON BUILD RUNNERS -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+
+			<!-- 2. SPRING BOOT PACKAGER -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -82,6 +93,8 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+			<!-- 3. MAVEN COMPILER PLUGIN -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
