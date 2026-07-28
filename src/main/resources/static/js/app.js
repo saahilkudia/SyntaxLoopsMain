@@ -1004,7 +1004,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div>
                             <label class="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-3">Live Webhook Receiver URL (Paste into Shopify)</label>
                             <div class="flex gap-4">
-                                <input type="text" id="webhook-url" readonly value="https://api.syntaxloops.com/api/v1/webhooks/shopify/${window.SyntaxAPI.Session.getTenantId()}/order-created" class="w-full bg-black/50 border border-slate-700/60 rounded-xl px-5 py-4 text-syntaxCyan font-mono text-sm outline-none cursor-text select-all">
+                                <input type="text" id="webhook-url" readonly value="${window.location.origin}/api/v1/webhooks/shopify/${window.SyntaxAPI.Session.getTenantId()}/order-created" class="w-full bg-black/50 border border-slate-700/60 rounded-xl px-5 py-4 text-syntaxCyan font-mono text-sm outline-none cursor-text select-all">
                                 <button onclick="navigator.clipboard.writeText(document.getElementById('webhook-url').value); window.showSystemAlert('Copied', 'URL copied to clipboard.', 'success');" class="bg-slate-800 border border-slate-700 hover:bg-syntaxCyan hover:text-black text-white px-6 rounded-xl font-bold transition-colors shadow-md"><i class="fa-regular fa-copy"></i></button>
                             </div>
                             <p class="text-xs text-slate-500 mt-3"><i class="fa-solid fa-circle-info mr-1"></i>Ensure the format in Shopify is set to JSON.</p>
