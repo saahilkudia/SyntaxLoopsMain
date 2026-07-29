@@ -1,8 +1,9 @@
 window.SyntaxAPI = (function () {
     const USE_REAL_BACKEND = true;
 
-    // Dynamic BASE_URL: Automatically detects production domain and routes API calls to api.syntaxloops.com
-    const isProduction = window.location.hostname.endsWith('syntaxloops.com');
+    // Detect if running on app.syntaxloops.com and route to api.syntaxloops.com
+    const isProduction = window.location.hostname === 'app.syntaxloops.com';
+
     const BASE_URL = isProduction
         ? 'https://api.syntaxloops.com/api'
         : window.location.origin + '/api';

@@ -9,12 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+// @CrossOrigin IS REMOVED HERE
 public class AuthController {
 
     @Autowired
@@ -36,13 +35,11 @@ public class AuthController {
                 ));
             }
 
-            // FIX: Hash the incoming password and compare against the hashed database value
             String hashedPassword = SecurityUtils.hashPassword(password);
-
             ApiFuture<QuerySnapshot> future = firestore.collection("users")
                     .whereEqualTo("email", email)
-                    .whereEqualTo("password", hashedPassword) // Secure comparison
-                    .limit(1) // Performance optimization
+                    .whereEqualTo("password", hashedPassword)
+                    .limit(1)
                     .get();
 
             if (!future.get().isEmpty()) {
@@ -58,7 +55,6 @@ public class AuthController {
             }
 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid credentials"));
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
         }
@@ -70,13 +66,12 @@ public class AuthController {
             String docId = payload.get("docId");
             String newPassword = payload.get("newPassword");
 
-            // FIX: Hash the new password before storing it
             String hashedPassword = SecurityUtils.hashPassword(newPassword);
-
             firestore.collection("users").document(docId).update(
                     "password", hashedPassword,
                     "requiresPasswordReset", false
             ).get();
+
             return ResponseEntity.ok(Map.of("status", "SUCCESS", "message", "Password updated securely."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
