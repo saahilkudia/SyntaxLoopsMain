@@ -971,8 +971,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <thead>
                         <tr class="bg-black/40 text-[10px] font-mono text-slate-400 uppercase tracking-wider border-b border-slate-700/50">
                             <th class="p-6 font-bold">Account Name</th>
-                            <th class="p-6 font-bold text-right">Debit (Rs.)</th>
-                            <th class="p-6 font-bold text-right">Credit (Rs.)</th>
+                            <th class="p-6 font-bold text-right">Debit</th>
+                            <th class="p-6 font-bold text-right">Credit</th>
                         </tr>
                         </thead>
                         <tbody class="text-sm font-medium text-slate-300">
