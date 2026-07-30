@@ -30,6 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     };
 
+    window.formatMoney = (amount) => {
+        const symbol = window.SyntaxAPI.Session.getCurrency();
+        const val = parseFloat(amount) || 0;
+        return `${symbol}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    };
+
     window.showInputModal = (title, inputsHtml, onSubmitCallback) => {
         const overlay = document.createElement('div');
         overlay.className = 'fixed inset-0 z-[200] flex items-center justify-center bg-[#030712]/90 backdrop-blur-md fade-in';
@@ -132,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p class="text-[10px] font-mono font-bold text-syntaxCyan uppercase tracking-widest">Global MRR</p>
                             <i class="fa-solid fa-money-bill-trend-up text-slate-600"></i>
                         </div>
-                        <h2 class="text-3xl font-black text-white mb-1 relative z-10">Rs. ${globalMrr.toLocaleString()}</h2>
+                        <h2 class="text-3xl font-black text-white mb-1 relative z-10">${window.formatMoney(globalMrr)}</h2>
                         <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider relative z-10">Recurring Pipeline</p>
                         <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-syntaxCyan to-transparent opacity-50"></div>
                     </div>
@@ -163,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <p class="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-widest">Uncollected Setup</p>
                             <i class="fa-solid fa-file-invoice-dollar text-amber-500/50"></i>
                         </div>
-                        <h2 class="text-3xl font-black text-white mb-1 relative z-10">Rs. ${uncollectedSetup.toLocaleString()}</h2>
+                        <h2 class="text-3xl font-black text-white mb-1 relative z-10">${window.formatMoney(uncollectedSetup)}</h2>
                         <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-3 relative z-10">Pending Invoices</p>
                         <button class="w-full bg-amber-500/20 hover:bg-amber-500 text-amber-400 hover:text-black border border-amber-500/50 text-[10px] uppercase font-black py-2 rounded-lg transition-all relative z-10">
                             <i class="fa-solid fa-envelope mr-1"></i> Send Reminders
@@ -270,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </div>
                                     </td>
                                     <td class="p-6">
-                                        <div class="text-white font-mono font-bold text-base">Rs. ${(t.monthlyRate || 3500).toLocaleString()} <span class="text-slate-500 text-xs font-sans font-normal">/mo</span></div>
+                                        <div class="text-white font-mono font-bold text-base">${window.formatMoney(t.monthlyRate || 35)} <span class="text-slate-500 text-xs font-sans font-normal">/mo</span></div>
                                         <div class="text-[10px] font-bold mt-1.5 uppercase tracking-wider ${t.waiveSetupFee ? 'text-green-500' : 'text-slate-500'}">${t.waiveSetupFee ? 'Setup Waived' : 'Setup Billed'}</div>
                                     </td>
                                     <td class="p-6 text-center">
@@ -331,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <i class="fa-solid fa-chart-line text-xl"></i>
                                 </div>
                             </div>
-                            <h2 class="text-4xl font-black text-white mb-2">Rs. ${sales.toLocaleString()}</h2>
+                            <h2 class="text-4xl font-black text-white mb-2">${window.formatMoney(sales)}</h2>
                             <p class="text-[10px] text-syntaxCyan font-bold uppercase tracking-widest">Gross Pipeline Value</p>
                         </div>
                         <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-syntaxCyan to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -361,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <i class="fa-solid fa-receipt text-xl"></i>
                                 </div>
                             </div>
-                            <h2 class="text-4xl font-black text-white mb-2">Rs. ${aov.toLocaleString()}</h2>
+                            <h2 class="text-4xl font-black text-white mb-2">${window.formatMoney(aov)}</h2>
                             <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">Per Customer Spend</p>
                         </div>
                         <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -440,8 +446,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     ${o.carrierName ? `<div class="text-[9px] text-slate-500 mt-1 uppercase border border-slate-700 rounded px-1.5 py-0.5 inline-block bg-black/40">${o.carrierName}</div>` : ''}
                                 </td>
                                 <td class="p-6">
-                                    <div class="font-mono text-white font-bold">Rs. ${(o.totalOrderValue || 0).toLocaleString()}</div>
-                                    ${o.totalCogs > 0 ? `<div class="text-[10px] font-mono text-red-400 mt-1">COGS: Rs. ${o.totalCogs.toLocaleString()}</div>` : '<div class="text-[10px] font-mono text-slate-500 mt-1">COGS: Pending</div>'}
+                                    <div class="font-mono text-white font-bold">${window.formatMoney(o.totalOrderValue || 0)}</div>
+                                    ${o.totalCogs > 0 ? `<div class="text-[10px] font-mono text-red-400 mt-1">COGS: ${window.formatMoney(o.totalCogs)}</div>` : '<div class="text-[10px] font-mono text-slate-500 mt-1">COGS: Pending</div>'}
                                 </td>
                                 <td class="p-6">
                                     <span class="bg-${o.fulfillmentStatus === 'PENDING' ? 'blue' : (o.fulfillmentStatus === 'DISPATCHED' ? 'yellow' : (o.fulfillmentStatus === 'SETTLED' ? 'green' : 'slate'))}-500/10 text-${o.fulfillmentStatus === 'PENDING' ? 'blue' : (o.fulfillmentStatus === 'DISPATCHED' ? 'yellow' : (o.fulfillmentStatus === 'SETTLED' ? 'green' : 'slate'))}-400 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-${o.fulfillmentStatus === 'PENDING' ? 'blue' : (o.fulfillmentStatus === 'DISPATCHED' ? 'yellow' : (o.fulfillmentStatus === 'SETTLED' ? 'green' : 'slate'))}-500/30">${o.fulfillmentStatus}</span>
@@ -515,8 +521,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             <tr class="border-b border-slate-700/50 hover:bg-white/[0.02] transition-colors">
                                 <td class="p-6 font-mono text-syntaxCyan font-bold tracking-tight">${s.skuCode}</td>
                                 <td class="p-6 text-white font-bold">${s.productName}</td>
-                                <td class="p-6 text-right font-mono text-emerald-400">Rs. ${(s.unitPrice||0).toLocaleString()}</td>
-                                <td class="p-6 text-right font-mono text-slate-400">Rs. ${(s.averageCost||0).toLocaleString()}</td>
+                                <td class="p-6 text-right font-mono text-emerald-400">${window.formatMoney(s.unitPrice)}</td>
+                                <td class="p-6 text-right font-mono text-slate-400">${window.formatMoney(s.averageCost)}</td>
                                 <td class="p-6 text-center">
                                     <span class="bg-${s.currentStock > 10 ? 'green' : 'red'}-500/10 text-${s.currentStock > 10 ? 'green' : 'red'}-400 px-4 py-1.5 rounded-lg text-xs font-black border border-${s.currentStock > 10 ? 'green' : 'red'}-500/30 shadow-sm">${s.currentStock} Units</span>
                                 </td>
@@ -607,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <td class="p-6 font-mono text-syntaxCyan font-bold">${a.accountCode}</td>
                                 <td class="p-6 text-white font-bold text-base">${a.accountName}</td>
                                 <td class="p-6"><span class="bg-blue-500/10 text-blue-400 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase border border-blue-500/20">${a.accountCategory}</span></td>
-                                <td class="p-6 text-right font-mono text-white text-lg">Rs. ${(a.currentBalance || 0).toLocaleString()}</td>
+                                <td class="p-6 text-right font-mono text-white text-lg">${window.formatMoney(a.currentBalance)}</td>
                             </tr>
                         `).join('')}
                         </tbody>
@@ -868,15 +874,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         <h3 class="text-xl font-black text-syntaxCyan uppercase tracking-widest border-b border-slate-700/50 pb-4 mb-6">Assets</h3>
                         <div class="space-y-5">
                             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Current Assets</p>
-                            <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Bank Accounts (1001)</span><span class="font-mono">Rs. ${bankBal.toLocaleString()}</span></div>
-                            <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Courier Escrow (A/R)</span><span class="font-mono">Rs. ${escrowBal.toLocaleString()}</span></div>
-                            <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Physical Inventory</span><span class="font-mono">Rs. ${invBal.toLocaleString()}</span></div>
+                            <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Bank Accounts (1001)</span><span class="font-mono">${window.formatMoney(bankBal)}</span></div>
+                            <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Courier Escrow (A/R)</span><span class="font-mono">${window.formatMoney(escrowBal)}</span></div>
+                            <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Physical Inventory</span><span class="font-mono">${window.formatMoney(invBal)}</span></div>
                             <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-6">Fixed Assets</p>
-                            <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Equipment (Net)</span><span class="font-mono">Rs. ${equipBal.toLocaleString()}</span></div>
+                            <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Equipment (Net)</span><span class="font-mono">${window.formatMoney(equipBal)}</span></div>
                         </div>
                         <div class="flex justify-between items-center mt-10 pt-6 border-t border-slate-700/50">
                             <span class="text-lg font-black text-white">Total Assets</span>
-                            <span class="text-2xl font-mono font-black text-syntaxCyan">Rs. ${totalAssets.toLocaleString()}</span>
+                            <span class="text-2xl font-mono font-black text-syntaxCyan">${window.formatMoney(totalAssets)}</span>
                         </div>
                     </div>
 
@@ -885,14 +891,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             <h3 class="text-xl font-black text-white uppercase tracking-widest border-b border-slate-700/50 pb-4 mb-6">Liabilities & Equity</h3>
                             <div class="space-y-5">
                                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Liabilities</p>
-                                <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Accounts Payable</span><span class="font-mono">Rs. ${apBal.toLocaleString()}</span></div>
+                                <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Accounts Payable</span><span class="font-mono">${window.formatMoney(apBal)}</span></div>
                                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mt-8">Owner's Equity</p>
-                                <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Retained Earnings</span><span class="font-mono">Rs. ${retainedBal.toLocaleString()}</span></div>
+                                <div class="flex justify-between text-base text-slate-300 pl-4"><span class="text-white">Retained Earnings</span><span class="font-mono">${window.formatMoney(retainedBal)}</span></div>
                             </div>
                         </div>
                         <div class="flex justify-between items-center mt-10 pt-6 border-t border-slate-700/50">
                             <span class="text-lg font-black text-white">Total Liab. & Equity</span>
-                            <span class="text-2xl font-mono font-black text-white">Rs. ${totalLiab.toLocaleString()}</span>
+                            <span class="text-2xl font-mono font-black text-white">${window.formatMoney(totalLiab)}</span>
                         </div>
                     </div>
                 </div>
@@ -922,15 +928,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="absolute top-0 right-0 w-64 h-64 bg-syntaxCyan/5 rounded-full blur-3xl pointer-events-none"></div>
                     
                     <h3 class="text-xs font-mono font-bold text-syntaxCyan uppercase tracking-widest border-b border-slate-700/50 pb-3 mb-6 relative z-10">Revenue</h3>
-                    <div class="flex justify-between text-base text-slate-300 mb-3 pl-4 relative z-10"><span class="text-white">Gross Sales</span><span class="font-mono">Rs. ${rev.toLocaleString()}</span></div>
-                    <div class="flex justify-between text-lg font-black text-white mb-10 border-t border-slate-700/50 pt-4 relative z-10"><span>Total Net Revenue</span><span class="font-mono">Rs. ${rev.toLocaleString()}</span></div>
+                    <div class="flex justify-between text-base text-slate-300 mb-3 pl-4 relative z-10"><span class="text-white">Gross Sales</span><span class="font-mono">${window.formatMoney(rev)}</span></div>
+                    <div class="flex justify-between text-lg font-black text-white mb-10 border-t border-slate-700/50 pt-4 relative z-10"><span>Total Net Revenue</span><span class="font-mono">${window.formatMoney(rev)}</span></div>
 
                     <h3 class="text-xs font-mono font-bold text-syntaxCyan uppercase tracking-widest border-b border-slate-700/50 pb-3 mb-6 relative z-10">Expenses</h3>
-                    <div class="flex justify-between text-base text-slate-300 mb-4 pl-4 relative z-10"><span class="text-white">Cost of Goods Sold (COGS)</span><span class="font-mono text-red-400">Rs. ${cogs.toLocaleString()}</span></div>
-                    <div class="flex justify-between text-base text-slate-300 mb-8 pl-4 relative z-10"><span class="text-white">Marketing & Operations</span><span class="font-mono text-red-400">Rs. ${marketing.toLocaleString()}</span></div>
+                    <div class="flex justify-between text-base text-slate-300 mb-4 pl-4 relative z-10"><span class="text-white">Cost of Goods Sold (COGS)</span><span class="font-mono text-red-400">${window.formatMoney(cogs)}</span></div>
+                    <div class="flex justify-between text-base text-slate-300 mb-8 pl-4 relative z-10"><span class="text-white">Marketing & Operations</span><span class="font-mono text-red-400">${window.formatMoney(marketing)}</span></div>
 
                     <div class="flex justify-between items-center text-2xl font-black text-${netColor} bg-black/40 border border-${netColor}/30 p-6 rounded-2xl mt-8 relative z-10 shadow-inner">
-                        <span>Net Operating Income</span><span class="font-mono">Rs. ${net.toLocaleString()}</span>
+                        <span>Net Operating Income</span><span class="font-mono">${window.formatMoney(net)}</span>
                     </div>
                 </div>
             </div>
@@ -1349,6 +1355,17 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <input type="text" id="modal-tenant-name" required placeholder="e.g. Al-Fatah Supermarket" class="w-full bg-black/50 border border-slate-700/60 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-syntaxCyan transition-colors">
                                 </div>
                                 
+                                <!-- NEW BASE CURRENCY DROPDOWN -->
+                                <div class="pt-2">
+                                    <label class="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-1">Base Currency</label>
+                                    <select id="modal-currency" class="w-full bg-black/50 border border-slate-700/60 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-syntaxCyan transition-colors">
+                                        <option value="$">USD ($)</option>
+                                        <option value="£">GBP (£)</option>
+                                        <option value="€">EUR (€)</option>
+                                        <option value="Rs. ">PKR (Rs.)</option>
+                                    </select>
+                                </div>
+                            
                                 <div class="grid grid-cols-2 gap-5 pt-2">
                                     <div>
                                         <label class="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-1">Director Full Name</label>
@@ -1359,7 +1376,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <input type="email" id="modal-admin-email" placeholder="Leave blank to auto-generate" class="w-full bg-black/50 border border-slate-700/60 rounded-xl px-4 py-3 text-white text-sm outline-none focus:border-syntaxCyan transition-colors">
                                     </div>
                                 </div>
-
+                            
                                 <div class="p-5 bg-slate-900 rounded-xl border border-slate-700/50 mt-4 shadow-inner relative overflow-hidden">
                                     <div class="absolute top-0 right-0 w-32 h-32 bg-syntaxCyan/5 rounded-full blur-2xl pointer-events-none"></div>
                                     <p class="text-[10px] font-mono text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-700 pb-2"><i class="fa-solid fa-file-invoice-dollar mr-2"></i>Financial Contract Parameters</p>
@@ -1367,7 +1384,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <div class="flex items-center justify-between mb-5">
                                         <div>
                                             <span class="text-sm text-white font-bold block">Waive Setup Fee</span>
-                                            <span class="text-[9px] text-slate-500 font-mono">Bypasses initial 15,000 PKR charge.</span>
+                                            <!-- STRIPPED PKR HARDCODING -->
+                                            <span class="text-[9px] text-slate-500 font-mono">Bypasses initial setup charge.</span>
                                         </div>
                                         <label class="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" id="modal-waive-setup" class="sr-only peer">
@@ -1375,8 +1393,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </label>
                                     </div>
                                     <div>
-                                        <label class="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-2">Recurring MRR Retainer (PKR)</label>
-                                        <input type="number" id="modal-sub-rate" value="3500" required class="w-full bg-black/80 border border-slate-700/60 rounded-xl px-4 py-3 text-white font-mono text-base outline-none focus:border-syntaxCyan transition-colors">
+                                        <!-- STRIPPED PKR HARDCODING -->
+                                        <label class="block text-[10px] font-mono text-slate-500 uppercase font-bold mb-2">Recurring MRR Retainer</label>
+                                        <!-- UPDATED DEFAULT TO 35 -->
+                                        <input type="number" id="modal-sub-rate" value="35" required class="w-full bg-black/80 border border-slate-700/60 rounded-xl px-4 py-3 text-white font-mono text-base outline-none focus:border-syntaxCyan transition-colors">
                                     </div>
                                 </div>
                             </div>

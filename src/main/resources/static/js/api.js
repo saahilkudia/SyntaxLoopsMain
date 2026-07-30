@@ -3,7 +3,6 @@ window.SyntaxAPI = (function () {
 
     // Detect if running on app.syntaxloops.com and route to api.syntaxloops.com
     const isProduction = window.location.hostname === 'app.syntaxloops.com';
-
     const BASE_URL = isProduction
         ? 'https://api.syntaxloops.com/api'
         : window.location.origin + '/api';
@@ -14,12 +13,16 @@ window.SyntaxAPI = (function () {
             localStorage.setItem('sl_tenant', u.tenantId);
             localStorage.setItem('sl_role', u.role);
             localStorage.setItem('sl_name', u.name);
+            // Save the dynamic currency symbol returned from backend
+            localStorage.setItem('sl_currency', u.currencySymbol || '$');
         },
         clear: () => localStorage.clear(),
         getToken: () => localStorage.getItem('sl_token'),
         getTenantId: () => localStorage.getItem('sl_tenant'),
         getRole: () => localStorage.getItem('sl_role'),
-        getName: () => localStorage.getItem('sl_name')
+        getName: () => localStorage.getItem('sl_name'),
+        // Retrieve dynamic currency symbol or default to USD
+        getCurrency: () => localStorage.getItem('sl_currency') || '$'
     };
 
     async function fetchAPI(endpoint, method = 'GET', body = null) {
@@ -53,6 +56,7 @@ window.SyntaxAPI = (function () {
                 }
                 throw new Error(data?.message || `Server Error: ${response.status}`);
             }
+
             return data;
         } catch (error) {
             console.error(`[API FAILED] ${method} ${endpoint}:`, error.message);

@@ -4,16 +4,17 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.syntaxloops.operations.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-// @CrossOrigin IS REMOVED HERE
 public class AuthController {
 
     @Autowired
@@ -25,12 +26,14 @@ public class AuthController {
         String password = credentials.get("password");
 
         try {
+            // Master Admin bypass
             if ("ceo@syntaxloops.com".equalsIgnoreCase(email) && "admin123".equals(password)) {
                 return ResponseEntity.ok(Map.of(
                         "token", "master_jwt_token",
                         "tenantId", "SL_HQ",
                         "role", "SUPER_ADMIN",
                         "name", "Super Admin (Global HQ)",
+                        "currencySymbol", "$",
                         "requiresPasswordReset", false
                 ));
             }
@@ -44,17 +47,28 @@ public class AuthController {
 
             if (!future.get().isEmpty()) {
                 QueryDocumentSnapshot userDoc = future.get().getDocuments().get(0);
+                String tenantId = userDoc.getString("tenantId");
+
+                // Fetch the tenant's configuration to get their specific currency
+                DocumentSnapshot tenantSnap = firestore.collection("tenants").document(tenantId).get().get();
+                String currencySymbol = "$"; // Default fallback
+                if (tenantSnap.exists() && tenantSnap.getString("currencySymbol") != null) {
+                    currencySymbol = tenantSnap.getString("currencySymbol");
+                }
+
                 return ResponseEntity.ok(Map.of(
                         "token", "tenant_jwt_token",
-                        "tenantId", userDoc.getString("tenantId"),
+                        "tenantId", tenantId,
                         "role", userDoc.getString("role"),
                         "name", userDoc.getString("name"),
+                        "currencySymbol", currencySymbol,
                         "requiresPasswordReset", userDoc.getBoolean("requiresPasswordReset") != null ? userDoc.getBoolean("requiresPasswordReset") : false,
                         "docId", userDoc.getId()
                 ));
             }
 
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Invalid credentials"));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
         }
@@ -65,14 +79,15 @@ public class AuthController {
         try {
             String docId = payload.get("docId");
             String newPassword = payload.get("newPassword");
-
             String hashedPassword = SecurityUtils.hashPassword(newPassword);
+
             firestore.collection("users").document(docId).update(
                     "password", hashedPassword,
                     "requiresPasswordReset", false
             ).get();
 
             return ResponseEntity.ok(Map.of("status", "SUCCESS", "message", "Password updated securely."));
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", e.getMessage()));
         }

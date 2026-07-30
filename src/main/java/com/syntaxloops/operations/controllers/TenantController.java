@@ -29,12 +29,10 @@ public class TenantController {
 
         // 1. EXTRACT CUSTOM OVERRIDES OR USE SMART DEFAULTS
         String tenantId = businessName.toUpperCase().replaceAll("\\s+", "_") + "_HQ";
-
         String adminEmail = payload.get("adminEmail");
         if (adminEmail == null || adminEmail.trim().isEmpty()) {
             adminEmail = "admin@" + businessName.toLowerCase().replaceAll("\\s+", "") + ".com";
         }
-
         String adminName = payload.getOrDefault("adminName", businessName + " Director");
 
         // Extract and parse waiveSetup
@@ -44,15 +42,19 @@ public class TenantController {
         String subRateStr = payload.getOrDefault("subRate", "3500");
         double subRate = Double.parseDouble(subRateStr);
 
+        // Extract the requested base currency (defaulting to USD if not provided)
+        String currencySymbol = payload.getOrDefault("currencySymbol", "$");
+
         String tempPassword = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        // 2. Save Tenant Config to Firestore (Now with Billing Levers)
+        // 2. Save Tenant Config to Firestore (Now with Billing Levers and Base Currency)
         Map<String, Object> tenantData = new HashMap<>();
         tenantData.put("id", tenantId);
         tenantData.put("name", businessName);
         tenantData.put("flagged", false);
         tenantData.put("waiveSetupFee", waiveSetup);
         tenantData.put("monthlyRate", subRate);
+        tenantData.put("currencySymbol", currencySymbol);
         tenantData.put("createdAt", System.currentTimeMillis());
 
         firestore.collection("tenants").document(tenantId).set(tenantData).get();
