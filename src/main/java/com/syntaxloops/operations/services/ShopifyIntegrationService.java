@@ -143,10 +143,10 @@ public class ShopifyIntegrationService {
             if (snap.exists() && snap.contains("shopifySecret")) {
                 return snap.getString("shopifySecret");
             }
-            // Fallback for development/testing
-            return "your_dev_shopify_secret_here";
         } catch (Exception e) {
-            return null;
+            // Log error
         }
+        // PRODUCTION SECURITY FIX: Never fallback to a default dev string
+        throw new SecurityException("Shopify Secret not configured for tenant: " + tenantId);
     }
 }

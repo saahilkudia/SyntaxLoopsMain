@@ -35,28 +35,30 @@ public class TenantController {
         }
         String adminName = payload.getOrDefault("adminName", businessName + " Director");
 
-        // Extract and parse waiveSetup
+        // Extract and parse financial configuration parameters
         String waiveSetupStr = payload.getOrDefault("waiveSetup", "false");
         boolean waiveSetup = Boolean.parseBoolean(waiveSetupStr);
-
         String subRateStr = payload.getOrDefault("subRate", "3500");
         double subRate = Double.parseDouble(subRateStr);
 
-        // Extract the requested base currency (defaulting to USD if not provided)
+        // --- CURRENCY SYMBOL FIX ---
+        // Safely extract the currency symbol sent from the modal, defaulting to "$"
         String currencySymbol = payload.getOrDefault("currencySymbol", "$");
+        if (currencySymbol == null || currencySymbol.trim().isEmpty()) {
+            currencySymbol = "$";
+        }
 
         String tempPassword = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
-        // 2. Save Tenant Config to Firestore (Now with Billing Levers and Base Currency)
+        // 2. Save Tenant Config to Firestore (Including currency symbol mapping)
         Map<String, Object> tenantData = new HashMap<>();
         tenantData.put("id", tenantId);
         tenantData.put("name", businessName);
         tenantData.put("flagged", false);
         tenantData.put("waiveSetupFee", waiveSetup);
         tenantData.put("monthlyRate", subRate);
-        tenantData.put("currencySymbol", currencySymbol);
+        tenantData.put("currencySymbol", currencySymbol.trim());
         tenantData.put("createdAt", System.currentTimeMillis());
-
         firestore.collection("tenants").document(tenantId).set(tenantData).get();
 
         // 3. Save First User to Firestore (Using secure hash)
@@ -67,15 +69,15 @@ public class TenantController {
         userData.put("role", "TENANT_CEO");
         userData.put("name", adminName);
         userData.put("requiresPasswordReset", true);
-
         firestore.collection("users").add(userData).get();
 
-        // Return credentials to Master Admin UI
+        // Return credentials and metadata to Master Admin UI
         Map<String, Object> response = new HashMap<>();
         response.put("id", tenantId);
         response.put("name", businessName);
         response.put("tempPassword", tempPassword);
         response.put("adminEmail", adminEmail);
+        response.put("currencySymbol", currencySymbol.trim());
 
         return ResponseEntity.ok(response);
     }
